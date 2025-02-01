@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org"   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{template_ChefDepartement.html}">
+<head>
+    <meta charset="UTF-8">
+    <link  rel="stylesheet" href="../static/css/bootstrap.css" th:href="@{/css/bootstrap.css}"/>
+    <link  rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}"/>
+    <link  rel="stylesheet" href="../static/css/buttons.dataTables.min.css" th:href="@{/css/buttons.dataTables.min.css}"/>
+    <link  rel="stylesheet" href="../static/css/jquery.dataTables.min.css" th:href="@{/css/jquery.dataTables.min.css}"/>
+
+    <script src="../static/js/jquery-3.7.0.js" th:src="@{/js/jquery-3.7.0.js}"></script>
+    <script src="../static/js/bootstrap.js" th:src="@{/js/bootstrap.js}"></script>
+    <script src="../static/js/dataTables.buttons.min.js" th:src="@{/js/dataTables.buttons.min.js}"></script>
+    <script src="../static/js/jquery.dataTables.min.js" th:src="@{/js/jquery.dataTables.min.js}"></script>
+
+    <title>Title</title>
+
+<body>
+<div class="container">
+    <br/>
+
+    <h3 style="text-align: center">La liste des Formations</h3>
+
+    <div class="row" style="padding-bottom: 10px; padding-top: 10px">
+        <div style="text-align: center">
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#form_Ajouter_Formation" >Ajouter une Formation</button>
+        </div>
+    </div>
+    <!-- Debut popup ajouter un UE -->
+    <div data-dismiss="modal" style="margin-top:25px">
+        <div class="modal fade" id="form_Ajouter_Formation">
+            <div class="modal-dialog" >
+                <div class="modal-content panel-success" >
+                    <!--modal Header-->
+                    <div class="modal-header panel-heading" >
+                        <button type="button" class="close" data-dismiss="modal">x</button>
+                        <h4 class="modal-title" style="text-align: center">Ajouter un Formation</h4>
+                    </div>
+                    <!--modal Body-->
+                    <form th:action="@{ajouter_formation}" method="post">
+                        <div class="modal-body" >
+                            <div class="form-group">
+                                <label >Nom</label>
+                                <input type="text" class="form-control" name="nom" />
+                            </div>
+                            <div class="form-group">
+                                <label >Description</label>
+                                <input type="text" class="form-control" name="description" />
+                            </div>
+
+                            <!--modal Footer-->
+                            <div class="modal-footer" >
+                                <div class="row">
+                                    <div class="col-lg-3  col-md-3 col-sm-3 col-xs-4">
+                                        <button type="submit" class="btn btn-success">Ajouter</button>
+                                    </div>
+                                    <div class="col-lg-offset-5 col-lg-3 col-md-offset-5 col-md-3 col-sm-offset-5 col-sm-3 col-xs-8">
+                                        <button type="submit" class="btn btn-default " data-dismiss="modal">Annuler</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Fin popup ajouter un Formation -->
+    <!-- Debut lister tout les Formation -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="table_Formation">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Operations</th>
+                <th>Archiver</th>
+                <th>Details</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="formation:${listeDesFormations}">
+                <td th:text="${formation.nom}"></td>
+                <td th:text="${formation.description}"></td>
+                <td>
+                    <button class="btn btn-info btn-sm" data-title="Edit" data-toggle="modal" th:attr="data-target='#form_Modifier_Formation'+${formation.id}" >
+                        Modifier
+                    </button>
+                    <button class="btn btn-danger btn-sm" data-title="Delete" data-toggle="modal" th:attr="data-target='#form_Supprimer_Formation'+${formation.id}">
+                        Supprimer
+                    </button>
+                </td>
+
+                <td>
+                    <form th:action="@{/formation}" method="post" style="display:inline;">
+                        <input type="hidden" th:name="id" th:value="${formation.id}" />
+                        <button th:if="${!formation.archiver}" type="submit" class="btn btn-warning btn-xs">
+                            Archiver
+                        </button>
+                        <button th:if="${formation.archiver}" type="submit" class="btn btn-primary btn-xs">
+                            Désarchiver
+                        </button>
+
+                    </form>
+                </td>
+
+
+                <td>
+                    <a class="btn btn-primary btn-sn" th:href="@{/details_formation(id=${formation.id})}">Voir la Classe</a>
+                </td>
+                <!-- Debut popup modifier un Formation -->
+                <div data-dismiss="modal">
+                    <div class="modal fade" th:attr="id='form_Modifier_Formation'+${formation.id}" >
+                        <div class="modal-dialog" >
+                            <div class="modal-content panel-info" >
+                                <!--modal Header-->
+                                <div class="modal-header panel-heading" >
+                                    <button type="button" class="close" data-dismiss="modal">x</button>
+                                    <h4 class="modal-title" style="text-align: center">Modifier Formation</h4>
+                                </div>
+                                <!--modal Body-->
+                                <form th:action="@{modifier_formation}" method="post">
+                                    <div class="modal-body" >
+                                        <div style="display: none">
+                                            <input name="id" th:value="${formation.id}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label >Nom</label>
+                                            <input type="text" class="form-control" name="nom" th:value="${formation.nom}"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label >Description</label>
+                                            <input type="text" class="form-control" name="description" th:value="${formation.description}"/>
+                                        </div>
+                                    </div>
+                                    <!--modal Footer-->
+                                    <div class="modal-footer" >
+                                        <div class="row">
+                                            <div class="col-lg-3  col-md-3 col-sm-3 col-xs-4">
+                                                <button type="submit" class="btn btn-info" >Modifier</button>
+                                            </div>
+                                            <div class="col-lg-offset-5 col-lg-3 col-md-offset-5 col-md-3 col-sm-offset-5 col-sm-3 col-xs-8">
+                                                <button type="button" class="btn btn-default " data-dismiss="modal">Annuler</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Fin popup modifier un Formation -->
+
+                <!-- Debut popup supprimer un Formation -->
+                <div data-dismiss="modal">
+                    <div class="modal fade" th:attr="id='form_Supprimer_Formation'+${formation.id}">
+                        <div class="modal-dialog" >
+                            <div class="modal-content panel-danger" >
+                                <!--modal Header-->
+                                <div class="modal-header panel-heading" >
+                                    <button type="button" class="close" data-dismiss="modal">x</button>
+                                    <h4 class="modal-title" style="text-align: center">Supprimer Formation</h4>
+                                </div>
+                                <!--modal Body-->
+                                <form th:action="@{supprimer_formation}" method="post">
+                                    <div class="modal-body" >
+                                        <div style="display: none">
+                                            <input name="id" th:value="${formation.id}" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label >Nom</label> :
+                                            <span th:text="${formation.nom}"/> </span>
+                                        </div>
+                                    </div>
+                                    <!--modal Footer-->
+                                    <div class="modal-footer" >
+                                        <div class="row">
+                                            <div class="col-lg-3  col-md-3 col-sm-3 col-xs-4">
+                                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                                            </div>
+                                            <div class="col-lg-offset-5 col-lg-3 col-md-offset-5 col-md-3 col-sm-offset-5 col-sm-3 col-xs-8">
+                                                <button type="button" class="btn btn-default " data-dismiss="modal">Annuler</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Fin popup supprimer un Formation -->
+
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <button class="btn-retour" onclick="window.location.href='/ChefDepartement/Accueil'">Retour</button>
+    </div>
+
+    <!-- Fin lister tout les Formation -->
+</div>
+<!-- Debut Datatable lister Formation -->
+<script>
+            $(document).ready(function() {
+                $("#table_Formation").DataTable({
+
+                });
+            })
+        </script>
+<!-- Fin Datatable lister Formation -->
+</body>
+</html>

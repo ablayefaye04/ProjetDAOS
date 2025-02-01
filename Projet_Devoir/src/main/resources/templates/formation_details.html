@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org"   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{template_ChefDepartement.html}">
+<head>
+    <meta charset="UTF-8">
+    <link  rel="stylesheet" href="../static/css/bootstrap.css" th:href="@{/css/bootstrap.css}"/>
+    <link  rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}"/>
+    <link  rel="stylesheet" href="../static/css/buttons.dataTables.min.css" th:href="@{/css/buttons.dataTables.min.css}"/>
+    <link  rel="stylesheet" href="../static/css/jquery.dataTables.min.css" th:href="@{/css/jquery.dataTables.min.css}"/>
+
+    <script src="../static/js/jquery-3.7.0.js" th:src="@{/js/jquery-3.7.0.js}"></script>
+    <script src="../static/js/bootstrap.js" th:src="@{/js/bootstrap.js}"></script>
+    <script src="../static/js/dataTables.buttons.min.js" th:src="@{/js/dataTables.buttons.min.js}"></script>
+    <script src="../static/js/jquery.dataTables.min.js" th:src="@{/js/jquery.dataTables.min.js}"></script>
+
+    <title>Title</title>
+
+<body>
+<div class="container">
+    <br/>
+
+    <h3 style="text-align: center">La liste des Classes</h3>
+
+    <div class="row" style="padding-bottom: 10px; padding-top: 10px">
+        <div style="text-align: center">
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#form_Ajouter_Classe" >Ajouter Classe</button>
+        </div>
+    </div>
+    <!-- Debut popup ajouter un Classe -->
+    <div data-dismiss="modal" style="margin-top:25px">
+        <div class="modal fade" id="form_Ajouter_Classe">
+            <div class="modal-dialog" >
+                <div class="modal-content panel-success" >
+                    <!--modal Header-->
+                    <div class="modal-header panel-heading" >
+                        <button type="button" class="close" data-dismiss="modal">x</button>
+                        <h4 class="modal-title" style="text-align: center">Ajouter une Classe</h4>
+                    </div>
+                    <!--modal Body-->
+                    <form th:action="@{/ajouter_classe_formation}" method="post" th:object="${newClasse}">
+                        <!-- Champ caché pour l'ID de la formation -->
+                        <input type="hidden" th:field="*{formation.id}" />
+
+                        <div class="form-group">
+                            <label>Niveau</label>
+                            <input type="text" class="form-control" th:field="*{niveau}" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <input type="text" class="form-control" th:field="*{descriptionClasse}" required />
+                        </div>
+                        <!--modal Footer-->
+                        <div class="modal-footer" >
+                            <div class="row">
+                                <div class="col-lg-3  col-md-3 col-sm-3 col-xs-4">
+                                    <button type="submit" class="btn btn-success">Ajouter</button>
+                                </div>
+                                <div class="col-lg-offset-5 col-lg-3 col-md-offset-5 col-md-3 col-sm-offset-5 col-sm-3 col-xs-8">
+                                    <button type="submit" class="btn btn-default " data-dismiss="modal">Annuler</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Fin popup ajouter un Classe -->
+<!-- Debut lister tout les Classe -->
+<div class="table-responsive">
+    <table class="table table-bordered table-striped" id="table_Classe">
+        <thead>
+        <tr>
+            <th>Niveau</th>
+            <th>Description</th>
+            <th>Operations</th>
+            <th>Maquette</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="classe : ${listeDesClasses}">
+            <td th:text="${classe.niveau}"></td>
+            <td th:text="${classe.descriptionClasse}"></td>
+            <td>
+                <!-- Bouton Modifier -->
+                <button
+                        class="btn btn-info btn-sm"
+                        data-toggle="modal"
+                        th:attr="data-target='#form_Modifier_Classe' + ${classe.id}">
+                    Modifier
+                </button>
+
+                <!-- Bouton Supprimer -->
+                <button
+                        class="btn btn-danger btn-sm"
+                        data-toggle="modal"
+                        th:attr="data-target='#form_Supprimer_Classe' + ${classe.id}">
+                    Supprimer
+                </button>
+            </td>
+            <td>
+            <a class="btn btn-info btn-sn"
+               th:href="@{'/maquettes/details_maquette_classe'(formation=${classe.formation.nom}, niveau=${classe.niveau})}">
+                Voir Maquette
+            </a>
+        </td>
+
+
+
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Modals -->
+    <div th:each="classe : ${listeDesClasses}">
+
+        <!-- Modal Modifier Classe -->
+        <div class="modal fade" th:attr="id='form_Modifier_Classe' + ${classe.id}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content panel-info">
+                    <div class="modal-header panel-heading">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title text-center">Modifier Classe</h4>
+                    </div>
+                    <form th:action="@{/modifier_classe_formation}" method="post">
+                        <div class="modal-body">
+                            <!-- Champs cachés nécessaires pour identifier la  classe et sa formation -->
+                            <input type="hidden" name="id" th:value="${classe.id}" />
+                            <input type="hidden" name="formation.id" th:value="${classe.formation.id}" />
+
+                            <!-- Champs de saisie pour les propriétés de la classe -->
+                            <div class="form-group">
+                                <label>Niveau</label>
+                                <input type="text" class="form-control" name="niveau" th:value="${classe.niveau}" />
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <input type="text" class="form-control" name="descriptionClasse" th:value="${classe.descriptionClasse}" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-info">Modifier</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Supprimer Classe -->
+        <div class="modal fade" th:attr="id='form_Supprimer_Classe' + ${classe.id}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content panel-danger">
+                    <div class="modal-header panel-heading">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title text-center">Supprimer Classe</h4>
+                    </div>
+                    <form th:action="@{/supprimer_classe_formation}" method="post">
+                        <div class="modal-body">
+                            <!-- Champs cachés nécessaires pour identifier la classe et sa formation -->
+                            <input type="hidden" name="id" th:value="${classe.id}" />
+                            <input type="hidden" name="formation.id" th:value="${classe.formation.id}" />
+
+                            <p>Êtes-vous sûr de vouloir supprimer cette Classe ?</p>
+                            <div>
+                                <strong>Niveau</strong> <span th:text="${classe.niveau}"></span><br />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Fin lister tout les Classe -->
+</div>
+    <div>
+        <button class="btn-retour" onclick="window.location.href='/formation'">Retour</button>
+    </div>
+</div>
+<!-- Debut Datatable lister Classe -->
+<script>
+    $(document).ready(function() {
+       $("#table_Classe").DataTable({
+       });
+    })
+</script>
+<!-- Fin Datatable lister Classe -->
+</body>
+</html>
