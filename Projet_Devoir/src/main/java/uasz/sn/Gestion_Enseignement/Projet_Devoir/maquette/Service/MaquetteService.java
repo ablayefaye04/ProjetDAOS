@@ -2,16 +2,16 @@ package uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Modele.EC;
-import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Modele.Formation;
-import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Modele.Maquette;
-import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Modele.UE;
+import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Modele.*;
 import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Repository.ECRepository;
 import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Repository.FormationRepository;
 import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Repository.MaquetteRepository;
 import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Repository.UERepository;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class MaquetteService {
@@ -79,4 +79,24 @@ public class MaquetteService {
         }
         maquetteRepository.save(maquette);
     }
+
+    //pour recupere les semesrtres
+    public Set<String> getAllSemestres(List<Maquette> maquettes) {
+        Set<String> semestres = new HashSet<>();
+        for (Maquette maquette : maquettes) {
+            semestres.add(maquette.getSemestre());  // Ajoute les semestres uniques
+        }
+        return semestres;
+    }
+
+    public Optional<Maquette> findBySemestreAndFormationAndClasseAndUe(String semestre, Formation formation, Classe classe, UE ue) {
+        return maquetteRepository.findBySemestreAndFormationAndClasseAndUe(semestre, formation, classe, ue);
+    }
+
+    public List<Maquette> findMaquettesForClasseAndFormation(Long classeId, Long formationId) {
+        return maquetteRepository.findMaquettesByClasseAndFormation(classeId, formationId);
+    }
+
+
+
 }

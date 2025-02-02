@@ -28,9 +28,6 @@ public class Maquette {
     @ManyToMany( cascade = CascadeType.ALL)
     private Collection<UE> ue;
 
-    //dans une maquette on peut avoir plusieur UC et une UC peut appartenir a plusieur maquette
-    @ManyToMany
-    private Collection<EC> ec;
 
     //une maquette peut une seule classe  alors qu'une maquette peut avoir plusieur classe
     @ManyToOne

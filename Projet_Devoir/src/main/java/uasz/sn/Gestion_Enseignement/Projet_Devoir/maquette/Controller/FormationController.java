@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Modele.Classe;
 import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Modele.Formation;
 import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Service.FormationService;
+import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Service.MaquetteService;
 
 
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.List;
 public class FormationController {
     @Autowired
     private FormationService formationService;
+    @Autowired
+    MaquetteService maquetteService;
 
     @RequestMapping(value = "/formation", method = RequestMethod.GET)
     public  String lister_formation(Model model){
@@ -59,6 +62,7 @@ public class FormationController {
 
         model.addAttribute("formation", formation);
         model.addAttribute("listeDesClasses", classeList);
+        model.addAttribute("listeDesUEs", maquetteService.findAllUE());
         model.addAttribute("newClasse", newClasse); // Objet pour le formulaire
         return "formation_details";
     }

@@ -27,6 +27,7 @@
             <button type="button" class="btn btn-success" data-toggle="modal" data-target="#form_Ajouter_Classe" >Ajouter Classe</button>
         </div>
     </div>
+
     <!-- Debut popup ajouter un Classe -->
     <div data-dismiss="modal" style="margin-top:25px">
         <div class="modal fade" id="form_Ajouter_Classe">
@@ -67,7 +68,8 @@
         </div>
     </div>
 <!-- Fin popup ajouter un Classe -->
-<!-- Debut lister tout les Classe -->
+
+    <!-- Debut lister tout les Classe -->
 <div class="table-responsive">
     <table class="table table-bordered table-striped" id="table_Classe">
         <thead>
@@ -100,14 +102,11 @@
                 </button>
             </td>
             <td>
-            <a class="btn btn-info btn-sn"
-               th:href="@{'/maquettes/details_maquette_classe'(formation=${classe.formation.nom}, niveau=${classe.niveau})}">
-                Voir Maquette
-            </a>
-        </td>
-
-
-
+                <a class="btn btn-info btn-sn"
+                   th:href="@{'/maquettes/details_maquette_classe?id=' + ${classe.formation.id} + '&classeId=' + ${classe.id}}">
+                    Voir Maquette
+                </a>
+            </td>
         </tr>
         </tbody>
     </table>

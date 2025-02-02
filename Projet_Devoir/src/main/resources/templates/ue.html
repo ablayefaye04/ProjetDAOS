@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/css/bootstrap.css}"/>
+    <link  rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}"/>
     <link rel="stylesheet" th:href="@{/css/buttons.dataTables.min.css}"/>
     <link rel="stylesheet" th:href="@{/css/jquery.dataTables.min.css}"/>
     <script th:src="@{/js/jquery-3.7.0.js}"></script>
@@ -13,7 +14,7 @@
     <title>UE</title>
 </head>
 <body>
-
+<div class="container">
 <div class="row" style="padding-bottom: 10px; padding-top: 10px">
     <div style="text-align: center">
         <h3>La liste des UE</h3>
@@ -174,6 +175,10 @@
     </div>
 </div>
 <!-- Fin popup supprimer un UE -->
-
+    <!-- Bouton Retour -->
+    <div>
+        <button class="btn-retour" onclick="window.location.href='/ChefDepartement/Accueil'">Retour</button>
+    </div>
+</div>
 </body>
 </html>

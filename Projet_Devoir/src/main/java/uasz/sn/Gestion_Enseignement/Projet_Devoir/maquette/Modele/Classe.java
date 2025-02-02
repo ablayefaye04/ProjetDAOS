@@ -18,4 +18,5 @@ public class Classe {
     private Formation formation;
     private String descriptionClasse;
 
+
 }
