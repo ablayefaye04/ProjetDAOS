@@ -55,3 +55,11 @@
     outline: none; /* Supprime le contour bleu au focus */
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Effet de halo au focus */
 }
+
+.btn i {
+    font-size: 0.8rem; /* Taille des icônes */
+    padding: 0; /* Évite l'ajout de padding autour des icônes */
+}
+
+
+

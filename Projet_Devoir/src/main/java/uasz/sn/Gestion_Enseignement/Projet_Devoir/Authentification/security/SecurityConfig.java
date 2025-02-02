@@ -27,7 +27,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/js/**", "/css/**").permitAll()
-                        .requestMatchers("/login**", "/logout**","/details_maquette_classe**").permitAll()
+                        .requestMatchers("/login**", "/logout**", "/details_maquette_classe**").permitAll()
                         .requestMatchers("/h2/**").permitAll()
                         .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/apiDTO/**").permitAll()
@@ -44,8 +44,12 @@ public class SecurityConfig {
                         .successForwardUrl("/")
                         .permitAll()
                 )
-                .csrf(csrf -> csrf.ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/api/**")))
-                .csrf(csrf -> csrf.ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/apiDTO/**")));
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/api/**"))
+                        .ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/apiDTO/**"))
+                );
+
         return http.build();
     }
+
 }

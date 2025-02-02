@@ -35,6 +35,11 @@ public class MaquetteService {
         maquetteRepository.save(maquette);
     }
 
+    // Récupérer une maquette par son ID
+    public Maquette getMaquetteById(Long id) {
+        return maquetteRepository.findById(id).orElse(null);
+    }
+
     //methode pour supprimer une maquette
     public void DeleteMaquetteById(Long id){
         maquetteRepository.deleteById(id);

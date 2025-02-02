@@ -1,10 +1,16 @@
 package uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import uasz.sn.Gestion_Enseignement.Projet_Devoir.Authentification.modele.Utilisateur;
+import uasz.sn.Gestion_Enseignement.Projet_Devoir.Authentification.service.UtilisateurService;
 import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Modele.*;
 import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Repository.ECRepository;
 import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Repository.FormationRepository;
@@ -15,6 +21,7 @@ import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Service.FormationServ
 import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Service.MaquetteService;
 import uasz.sn.Gestion_Enseignement.Projet_Devoir.maquette.Service.UEService;
 
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,6 +34,9 @@ public class MaquetteController {
     MaquetteRepository maquetteRepository;
     @Autowired
     MaquetteService maquetteService;
+
+    @Autowired
+    UtilisateurService utilisateurService;
 
     @Autowired
     private FormationService formationService;
@@ -91,18 +101,33 @@ public class MaquetteController {
     }
 
 
-    //Modifier une maquette
-    @PostMapping("/modifier")
-    public String ModifierMaquette(@ModelAttribute Maquette maquette){
-        maquetteService.UpdateMaquette(maquette);
-        return "redirect:/maquettes/liste";
+    // Traiter la soumission du formulaire de modification (POST)
+    @PreAuthorize("hasRole('ChefDepartement')")
+    @PostMapping("/modifier/{id}")
+    public String modifierMaquette(@PathVariable("id") Long id, Maquette maquette) {
+        Maquette existingMaquette = maquetteService.getMaquetteById(id);
+        if (existingMaquette == null) {
+            return "error_page";  // Retourner une page d'erreur si la maquette n'existe pas
+        }
+
+        // Sauvegarder la maquette modifiée
+        maquetteService.UpdateMaquette(existingMaquette);
+
+        return "redirect:/details_maquette_classe?id=" + existingMaquette.getFormation().getId() + "&classeId=" + existingMaquette.getClasse().getId();
     }
 
-    //supprimer une maquette
-    @GetMapping("/supprimer/{id}")
-    public String SupprimerMaquette(@PathVariable("id") Long id){
-        maquetteService.DeleteMaquetteById(id);
-        return "redirect:/maquettes/liste" ;
+    // Traiter la soumission du formulaire de suppression (POST)
+    @PreAuthorize("hasRole('ChefDepartement')")
+    @PostMapping("/supprimer/{id}")
+    public String supprimerMaquette(@PathVariable("id") Long id) {
+        Maquette maquette = maquetteService.getMaquetteById(id);
+        if (maquette != null) {
+            maquetteService.DeleteMaquetteById(id);  // On passe l'ID directement
+            return "redirect:/details_maquette_classe";  // Rediriger vers la page de détails après suppression
+        } else {
+            // Gérer le cas où la maquette n'existe pas (facultatif)
+            return "redirect:/error_page";  // Ou une autre page d'erreur
+        }
     }
 
     //archiver une maquette
@@ -112,11 +137,11 @@ public class MaquetteController {
         return "redirect:/maquettes/liste";
     }
 
-    //page pour afficher liste des maquette
     @GetMapping("/details_maquette_classe")
     public String afficherDetailsMaquetteParClasse(Model model,
                                                    @RequestParam("id") Long formationId,
-                                                   @RequestParam("classeId") Long classeId) {
+                                                   @RequestParam("classeId") Long classeId,
+                                                   Principal principal) {
         // Récupérer la formation et la classe par leurs ID
         Formation formation = formationService.afficherFormation(formationId);
         Classe classe = classeService.afficherClasse(classeId);
@@ -198,7 +223,22 @@ public class MaquetteController {
         model.addAttribute("totalCoefficient", totalCoefficient);
         model.addAttribute("totalSumFormula", totalSumFormula); // Ajout de la somme totale calculée
 
-        return "details_maquette_classe"; // Retourner à la page des détails de la maquette
-    }
+        // Utiliser Principal pour obtenir l'utilisateur connecté
+        String username = principal.getName(); // Récupérer le nom d'utilisateur
 
+        // Récupérer l'utilisateur depuis le service
+        Utilisateur utilisateur = utilisateurService.rechercher_Utilisateur(username);
+
+        if (utilisateur != null) {
+            model.addAttribute("utilisateur", utilisateur);
+
+            // Si l'utilisateur a un rôle "ChefDepartement", rediriger vers la page spécifique
+            if (utilisateur.getRoles().stream().anyMatch(role -> role.getRole().equals("ChefDepartement"))) {
+                return "details_maquette_classe_chef"; // Rediriger vers la page spécifique pour le Chef de Département
+            }
+        }
+
+        // Pour les autres utilisateurs, rediriger vers la page par défaut
+        return "details_maquette_classe"; // Page par défaut pour les autres utilisateurs
+    }
 }
