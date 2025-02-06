@@ -4,9 +4,11 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uasz.sn.Gestion_Enseignement.Projet_Devoir.Repartition.Modele.Enseignement;
 
 
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Data
@@ -28,4 +30,5 @@ public class EC {
     private UE ue;
     @OneToMany(mappedBy = "ec")
     private Collection <Module> modules;
+
 }

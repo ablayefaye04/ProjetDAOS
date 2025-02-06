@@ -19,131 +19,92 @@
   <h1 class="text-center mb-4">Détails de la Maquette</h1>
 
   <!-- Affichage des maquettes par semestre -->
-  <div>
-    <!-- Affichage de la classe comme un titre -->
-    <h2 th:text="${classe.formation.nom} + ' ' + ${classe.niveau}"></h2>
+    <div>
+        <!-- Affichage de la classe comme un titre -->
+        <h2 th:text="${classe.formation.nom} + ' ' + ${classe.niveau}"></h2>
 
-    <div th:each="semestre : ${semestres}" class="mt-4">
-      <!-- Titre du semestre -->
-      <h3>[[${semestre}]]</h3>
+        <div th:each="semestre : ${semestres}" class="mt-4">
+            <!-- Titre du semestre -->
+            <h3>[[${semestre}]]</h3>
+            <form th:action="@{/choix/save}" method="post">
+                <input type="hidden" name="enseignantId" th:value="${utilisateur.id}" />
+                <input type="hidden" name="classeId" th:value="${classe.id}" />
+                <input type="hidden" name="semestre" th:value="${semestre}" />
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th colspan="3">Unité d'Enseignement (UE)</th>
+                        <th colspan="7">EC associés</th>
+                        <th colspan="4">Choix</th>
+                    </tr>
+                    <tr>
+                        <th>Intitulé</th>
+                        <th>Crédits UE</th>
+                        <th>Coeff UE</th>
+                        <th>Intitulé</th>
+                        <th>CM</th>
+                        <th>TD</th>
+                        <th>TP</th>
+                        <th>CM+TD/TP</th>
+                        <th>TPE</th>
+                        <th>Coefficient</th>
+                        <th>CM</th>
+                        <th>TD</th>
+                        <th>TP</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <th:block th:each="maquette : ${maquettes}" th:if="${maquette.semestre == semestre}">
+                        <th:block th:each="ue, ueStat : ${maquette.ue}">
+                            <th:block th:with="ecCount=${#lists.size(ue.ecs)}">
+                                <tr th:each="ec, ecStat : ${ue.ecs}">
+                                    <!-- UE : Appliquer bg-light uniquement sur la première ligne de l'UE -->
+                                    <td th:if="${ecStat.first}" th:rowspan="${ecCount}" class="bg-light">
+                                        <strong th:text="${ue.code} + ' - ' + ${ue.libelle}"></strong>
+                                    </td>
+                                    <td th:if="${ecStat.first}" th:rowspan="${ecCount}" class="bg-light" th:text="${ue.credit}"></td>
+                                    <td th:if="${ecStat.first}" th:rowspan="${ecCount}" class="bg-light" th:text="${ue.coefficient}"></td>
 
-      <table class="table table-bordered table-striped">
-        <thead>
-        <tr>
-          <th colspan="3">Unité d'Enseignement (UE)</th>
-          <th colspan="7">EC associés</th>
-          <th colspan="3">Choix</th>
-        </tr>
-        <tr>
-          <th>Intitulé</th>
-          <th>Crédits UE</th>
-          <th>Coeff UE</th>
-          <th>Intitulé</th>
-          <th>CM</th>
-          <th>TD</th>
-          <th>TP</th>
-          <th>CM+TD/TP</th>
-          <th>TPE</th>
-          <th>Coefficient</th>
-          <th>CM</th>
-          <th>TD</th>
-          <th>TP</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="maquette : ${maquettes}" th:if="${maquette.semestre == semestre}">
-          <td rowspan="[[${#lists.size(maquette.ue) * 2}]]">
-            <div th:each="ue : ${maquette.ue}">
-              <strong th:text="${ue.code} + ' - ' + ${ue.libelle}"></strong>
-            </div>
-          </td>
-          <td rowspan="[[${#lists.size(maquette.ue) * 2}]]">
-            <div th:each="ue : ${maquette.ue}">
-              <span th:text="${ue.credit}"></span>
-            </div>
-          </td>
-          <td rowspan="[[${#lists.size(maquette.ue) * 2}]]">
-            <div th:each="ue : ${maquette.ue}">
-              <span th:text="${ue.coefficient}"></span>
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <span th:text="${ec.libelle}"></span>
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <span th:text="${ec.cm}"></span>
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <span th:text="${ec.td}"></span>
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <span th:text="${ec.tp}"></span>
-            </div>
-          </td>
-          <!-- Affichage de CM + TD / TP -->
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <span th:text="${ec.tp != 0 ? ec.cm + (ec.td / ec.tp) : ec.cm}"></span>
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <span th:text="${ec.tpe}"></span>
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <span th:text="${ec.coefficient}"></span>
-            </div>
-          </td>
-          <!-- Cases à cocher pour les colonnes "Choix" -->
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <input type="checkbox" th:id="'cmChoice_' + ${ec.id}" th:name="'cmChoice_' + ${ec.id}" />
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <input type="checkbox" th:id="'tdChoice_' + ${ec.id}" th:name="'tdChoice_' + ${ec.id}" />
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <input type="checkbox" th:id="'tpChoice_' + ${ec.id}" th:name="'tpChoice_' + ${ec.id}" />
-            </div>
-          </td>
-        </tr>
-        <!-- Ligne Total -->
-        <tr>
-          <td><strong>Total semestre</strong></td>
-          <td th:text="${totalCreditsUE[semestre]}"></td>
-          <td th:text="${totalCoeffUE[semestre]}"></td>
-          <td><strong>Total semestre</strong></td>
-          <td th:text="${totalCM[semestre]}"></td>
-          <td th:text="${totalTD[semestre]}"></td>
-          <td th:text="${totalTP[semestre]}"></td>
-          <td th:text="${totalSumFormula[semestre]}"></td> <!-- Affichage du total CM + TD / TP -->
-          <td th:text="${totalTPE[semestre]}"></td>
-          <td th:text="${totalCoefficient[semestre]}"></td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <!-- Bouton Retour -->
+                                    <!-- EC affichés ligne par ligne -->
+                                    <td th:text="${ec.libelle}"></td>
+                                    <td th:text="${ec.cm}"></td>
+                                    <td th:text="${ec.td}"></td>
+                                    <td th:text="${ec.tp}"></td>
+                                    <td th:text="${ec.tp != 0 ? ec.cm + (ec.td / ec.tp) : ec.cm}"></td>
+                                    <td th:text="${ec.tpe}"></td>
+                                    <td th:text="${ec.coefficient}"></td>
+                                    <!-- Cases à cocher pour chaque type -->
+                                    <td><input type="checkbox" name="choix[]" th:value="${ec.id} + '_CM'"  /></td>
+                                    <td><input type="checkbox" name="choix[]" th:value="${ec.id} + '_TD'"/></td>
+                                    <td><input type="checkbox" name="choix[]" th:value="${ec.id} + '_TP'" /></td>
+                                </tr>
+                            </th:block>
+                        </th:block>
+                    </th:block>
+                    <!-- Ligne Total : Appliquer bg-light -->
+                    <tr class="bg-light">
+                        <td><strong>Total semestre</strong></td>
+                        <td th:text="${totalCreditsUE[semestre]}"></td>
+                        <td th:text="${totalCoeffUE[semestre]}"></td>
+                        <td><strong>Total semestre</strong></td>
+                        <td th:text="${totalCM[semestre]}"></td>
+                        <td th:text="${totalTD[semestre]}"></td>
+                        <td th:text="${totalTP[semestre]}"></td>
+                        <td th:text="${totalSumFormula[semestre]}"></td>
+                        <td th:text="${totalTPE[semestre]}"></td>
+                        <td th:text="${totalCoefficient[semestre]}"></td>
+                        <th colspan="4"></th>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Bouton pour voir les choix -->
+                <button type="submit" class="btn btn-primary" id="submitButton">Voir mes choix</button>
+            </form>
+        </div>
+    </div>  <!-- Bouton Retour -->
   <a th:href="@{'/details_formation?id=' + ${classe.formation.id}}" class="btn btn-primary">Retour</a>
-
-</div>
-</div>
-
-
+    <!-- Lien vers la page des choix faits -->
 </div>
 
 <!-- Bootstrap JS and dependencies -->

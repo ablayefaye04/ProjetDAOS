@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uasz.sn.Gestion_Enseignement.Projet_Devoir.Repartition.Modele.Enseignement;
 
 import java.util.Collection;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -29,12 +31,14 @@ public class Maquette {
     private Collection<UE> ue;
 
 
-    //une maquette peut une seule classe  alors qu'une maquette peut avoir plusieur classe
+    //une classe  peut avoir plusieurs maquettes
     @ManyToOne
     private Classe classe;
 
     //variable boolean pour archiver une maquette
     private boolean archiver ;
+    @OneToMany(mappedBy = "maquette")
+    private Set<Enseignement> enseignements;
 
 
 }

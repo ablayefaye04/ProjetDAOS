@@ -21,9 +21,13 @@ public class EnseignantService {
         return enseignantRepository.findAll();
     }
 
-    public Enseignant rechercher(Long id){
-        return enseignantRepository.findById(id).get();
+    public Enseignant rechercherParId(Long id) {
+        System.out.println("Recherche de l'enseignant avec ID : " + id);
+        Enseignant enseignant = enseignantRepository.findById(id).orElse(null);
+        System.out.println("Résultat de la recherche : " + (enseignant != null ? enseignant.toString() : "Aucun enseignant trouvé"));
+        return enseignant;
     }
+
 
     public Enseignant modifier(Enseignant enseignant){
         return  enseignantRepository.save(enseignant);

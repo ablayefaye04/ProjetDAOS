@@ -87,161 +87,133 @@
     <div th:each="semestre : ${semestres}" class="mt-4">
       <!-- Titre du semestre -->
       <h3>[[${semestre}]]</h3>
+      <form th:action="@{/choix/save}" method="post">
+        <input type="hidden" name="enseignantId" th:value="${utilisateur.id}" />
+        <input type="hidden" name="classeId" th:value="${classe.id}" />
+        <input type="hidden" name="semestre" th:value="${semestre}" />
 
-      <table class="table table-bordered table-striped">
-        <thead>
-        <tr>
-          <th colspan="3">Unité d'Enseignement (UE)</th>
-          <th colspan="8">EC associés</th>
-          <th colspan="3">Choix</th>
-          <th colspan="2">Répartitions</th>
-        </tr>
-        <tr>
-          <th>Intitulé</th>
-          <th>Crédits UE</th>
-          <th>Coeff UE</th>
-          <th>Intitulé</th>
-          <th>CM</th>
-          <th>TD</th>
-          <th>TP</th>
-          <th>CM+TD/TP</th>
-          <th>TPE</th>
-          <th>Coefficient</th>
-          <th>Opérations</th>
-          <th>CM</th>
-          <th>TD</th>
-          <th>TP</th>
-          <th>Enseignements</th>
-          <th>Enseignants</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="maquette : ${maquettes}" th:if="${maquette.semestre == semestre}">
-          <td rowspan="[[${#lists.size(maquette.ue) * 2}]]">
-            <div th:each="ue : ${maquette.ue}">
-              <strong th:text="${ue.code} + ' - ' + ${ue.libelle}"></strong>
-            </div>
-          </td>
-          <td rowspan="[[${#lists.size(maquette.ue) * 2}]]">
-            <div th:each="ue : ${maquette.ue}">
-              <span th:text="${ue.credit}"></span>
-            </div>
-          </td>
-          <td rowspan="[[${#lists.size(maquette.ue) * 2}]]">
-            <div th:each="ue : ${maquette.ue}">
-              <span th:text="${ue.coefficient}"></span>
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <span th:text="${ec.libelle}"></span>
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <span th:text="${ec.cm}"></span>
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <span th:text="${ec.td}"></span>
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <span th:text="${ec.tp}"></span>
-            </div>
-          </td>
-          <!-- Affichage de CM + TD / TP -->
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <span th:text="${ec.tp != 0 ? ec.cm + (ec.td / ec.tp) : ec.cm}"></span>
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <span th:text="${ec.tpe}"></span>
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <span th:text="${ec.coefficient}"></span>
-            </div>
-          </td>
-          <!-- Colonne d'Opérations -->
-          <td>
-            <!-- Ouvre le modal de modification -->
-            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modifierModal" title="Modifier">
-              <i class="fa fa-edit"></i>
-            </button>
+        <table class="table table-bordered table-striped">
+          <thead>
+          <tr>
+            <th colspan="3" class="bg-light">Unité d'Enseignement (UE)</th>
+            <th colspan="8">EC associés</th>
+            <th colspan="3">Choix</th>
+            <th colspan="2">Répartitions</th>
+          </tr>
+          <tr>
+            <th class="bg-light">Intitulé</th>
+            <th class="bg-light">Crédits UE</th>
+            <th class="bg-light">Coeff UE</th>
+            <th>Intitulé</th>
+            <th>CM</th>
+            <th>TD</th>
+            <th>TP</th>
+            <th>CM+TD/TP</th>
+            <th>TPE</th>
+            <th>Coefficient</th>
+            <th>Opérations</th>
+            <th>CM</th>
+            <th>TD</th>
+            <th>TP</th>
+            <th>Enseignements</th>
+            <th>Enseignants</th>
+          </tr>
+          </thead>
+          <tbody>
+          <th:block th:each="maquette : ${maquettes}" th:if="${maquette.semestre == semestre}">
+            <th:block th:each="ue, ueStat : ${maquette.ue}">
+              <th:block th:with="ecCount=${#lists.size(ue.ecs)}">
+                <tr th:each="ec, ecStat : ${ue.ecs}" class="border-bottom">
+                  <!-- UE : Appliquer bg-light uniquement sur la première ligne de l'UE -->
+                  <td th:if="${ecStat.first}" th:rowspan="${ecCount}" class="bg-light">
+                    <strong th:text="${ue.code} + ' - ' + ${ue.libelle}"></strong>
+                  </td>
+                  <td th:if="${ecStat.first}" th:rowspan="${ecCount}" class="bg-light" th:text="${ue.credit}"></td>
+                  <td th:if="${ecStat.first}" th:rowspan="${ecCount}" class="bg-light" th:text="${ue.coefficient}"></td>
 
-            <!-- Ouvre le modal de suppression -->
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#supprimerModal" title="Supprimer"
-                    onclick="confirm('Êtes-vous sûr de vouloir supprimer cette maquette ?')">
-              <i class="fa fa-trash"></i>
-            </button>
-          </td>
+                  <!-- EC affichés ligne par ligne -->
+                  <td th:text="${ec.libelle}"></td>
+                  <td th:text="${ec.cm}"></td>
+                  <td th:text="${ec.td}"></td>
+                  <td th:text="${ec.tp}"></td>
+                  <td th:text="${ec.tp != 0 ? ec.cm + (ec.td / ec.tp) : ec.cm}"></td>
+                  <td th:text="${ec.tpe}"></td>
+                  <td th:text="${ec.coefficient}"></td>
 
-          <!-- Cases à cocher pour les colonnes "Choix" -->
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <input type="checkbox" th:id="'cmChoice_' + ${ec.id}" th:name="'cmChoice_' + ${ec.id}" />
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <input type="checkbox" th:id="'tdChoice_' + ${ec.id}" th:name="'tdChoice_' + ${ec.id}" />
-            </div>
-          </td>
-          <td th:each="ue : ${maquette.ue}">
-            <div th:each="ec : ${ue.ecs}">
-              <input type="checkbox" th:id="'tpChoice_' + ${ec.id}" th:name="'tpChoice_' + ${ec.id}" />
-            </div>
-          </td>
-          <div class="repartition">
-            <th>
-              <select id="enseignant" name="enseignant" class="form-control" required>
-                <option value="" disabled selected>Choisir</option>
-                <option th:each="enseignant : ${listeDesEnseignants}"
-                        th:value="${enseignant.id}"
-                        th:text="${enseignant.nom}"></option>
-              </select>
-            </th>
-            <th>
-              <select id="enseignement" name="enseignement" class="form-control" required>
-                <option value="" disabled selected>Choisir</option>
-                <option th:each="enseignement : ${listeDesEnseignements}"
-                        th:value="${enseignement.id}"
-                        th:text="${enseignement.libelle}"></option>
-              </select>
-            </th>
-          </div>
-        </tr>
-        <!-- Ligne Total -->
-        <tr>
-          <td><strong>Total semestre</strong></td>
-          <td th:text="${totalCreditsUE[semestre]}"></td>
-          <td th:text="${totalCoeffUE[semestre]}"></td>
-          <td><strong>Total semestre</strong></td>
-          <td th:text="${totalCM[semestre]}"></td>
-          <td th:text="${totalTD[semestre]}"></td>
-          <td th:text="${totalTP[semestre]}"></td>
-          <td th:text="${totalSumFormula[semestre]}"></td> <!-- Affichage du total CM + TD / TP -->
-          <td th:text="${totalTPE[semestre]}"></td>
-          <td th:text="${totalCoefficient[semestre]}"></td>
-        </tr>
-        </tbody>
-      </table>
+                  <!-- Colonne d'Opérations -->
+                  <td>
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modifierModal" title="Modifier">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#supprimerModal" title="Supprimer"
+                            onclick="confirm('Êtes-vous sûr de vouloir supprimer cette maquette ?')">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </td>
+                  <!-- Cases à cocher pour chaque type -->
+                  <td><input type="checkbox" name="choix[]" th:value="${ec.id} + '_CM'"  /></td>
+                  <td><input type="checkbox" name="choix[]" th:value="${ec.id} + '_TD'"/></td>
+                  <td><input type="checkbox" name="choix[]" th:value="${ec.id} + '_TP'" /></td>
+                  <!-- Sélections pour répartitions -->
+                  <td>
+                    <select id="enseignant" name="enseignant" class="form-control" required>
+                      <option value="" disabled selected>Choisir</option>
+                      <option th:each="enseignant : ${listeDesEnseignants}"
+                              th:value="${enseignant.id}"
+                              th:text="${enseignant.nom}"></option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="enseignement" name="enseignement" class="form-control" required>
+                      <option value="" disabled selected>Choisir</option>
+                      <option th:each="enseignement : ${listeDesEnseignements}"
+                              th:value="${enseignement.id}"
+                              th:text="${enseignement.libelle}"></option>
+                    </select>
+                  </td>
+                </tr>
+              </th:block>
+            </th:block>
+          </th:block>
+
+          <!-- Ligne Total : Appliquer bg-light -->
+          <tr class="bg-light">
+            <td><strong>Total semestre</strong></td>
+            <td th:text="${totalCreditsUE[semestre]}"></td>
+            <td th:text="${totalCoeffUE[semestre]}"></td>
+            <td><strong>Total semestre</strong></td>
+            <td th:text="${totalCM[semestre]}"></td>
+            <td th:text="${totalTD[semestre]}"></td>
+            <td th:text="${totalTP[semestre]}"></td>
+            <td th:text="${totalSumFormula[semestre]}"></td>
+            <td th:text="${totalTPE[semestre]}"></td>
+            <td th:text="${totalCoefficient[semestre]}"></td>
+            <td colspan="6"></td>
+          </tr>
+          </tbody>
+        </table>
+        <!-- Bouton pour voir les choix-->
+        <button type="submit" class="btn btn-primary" id="submitButton">Voir mes choix</button>
+      </form>
     </div>
   </div>
   <!-- Bouton Retour -->
   <a th:href="@{'/details_formation?id=' + ${classe.formation.id}}" class="btn btn-primary">Retour</a>
 
 </div>
-</div>
 
+<script>
+    // On écoute les changements sur les cases à cocher
+    document.querySelectorAll('.choice-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            // Vérifier si au moins une case est cochée
+            const anyChecked = document.querySelectorAll('.choice-checkbox:checked').length > 0;
 
-</div>
+            // Afficher ou masquer le bouton de soumission en fonction
+            document.getElementById('submitButton').style.display = anyChecked ? 'inline-block' : 'none';
+        });
+    });
+</script>
 
 <!-- Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

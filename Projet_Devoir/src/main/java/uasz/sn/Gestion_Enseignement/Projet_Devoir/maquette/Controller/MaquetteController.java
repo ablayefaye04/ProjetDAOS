@@ -100,36 +100,6 @@ public class MaquetteController {
         return "redirect:/maquettes/details_maquette_classe?id=" + formationId + "&classeId=" + classeId;
     }
 
-
-    // Traiter la soumission du formulaire de modification (POST)
-    @PreAuthorize("hasRole('ChefDepartement')")
-    @PostMapping("/modifier/{id}")
-    public String modifierMaquette(@PathVariable("id") Long id, Maquette maquette) {
-        Maquette existingMaquette = maquetteService.getMaquetteById(id);
-        if (existingMaquette == null) {
-            return "error_page";  // Retourner une page d'erreur si la maquette n'existe pas
-        }
-
-        // Sauvegarder la maquette modifiée
-        maquetteService.UpdateMaquette(existingMaquette);
-
-        return "redirect:/details_maquette_classe?id=" + existingMaquette.getFormation().getId() + "&classeId=" + existingMaquette.getClasse().getId();
-    }
-
-    // Traiter la soumission du formulaire de suppression (POST)
-    @PreAuthorize("hasRole('ChefDepartement')")
-    @PostMapping("/supprimer/{id}")
-    public String supprimerMaquette(@PathVariable("id") Long id) {
-        Maquette maquette = maquetteService.getMaquetteById(id);
-        if (maquette != null) {
-            maquetteService.DeleteMaquetteById(id);  // On passe l'ID directement
-            return "redirect:/details_maquette_classe";  // Rediriger vers la page de détails après suppression
-        } else {
-            // Gérer le cas où la maquette n'existe pas (facultatif)
-            return "redirect:/error_page";  // Ou une autre page d'erreur
-        }
-    }
-
     //archiver une maquette
     @PostMapping("/archiver/{id}")
     public String archiverMaquette(@PathVariable("id") Long id) {
